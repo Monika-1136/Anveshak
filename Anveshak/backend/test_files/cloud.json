@@ -1,0 +1,24 @@
+{
+  "logs": [
+    {
+      "timestamp": "2024-01-15T02:34:12Z",
+      "severity": "INFO",
+      "message": "Instance launched",
+      "user": "admin@company.com"
+    },
+    {
+      "timestamp": "2024-01-15T03:45:22Z",
+      "severity": "CRITICAL",
+      "message": "Unauthorized API access attempt",
+      "user": "unknown",
+      "source_ip": "203.0.113.45"
+    },
+    {
+      "timestamp": "2024-01-15T03:46:00Z",
+      "severity": "CRITICAL",
+      "message": "Privilege escalation detected",
+      "user": "compromised_account",
+      "action": "IAM policy modified"
+    }
+  ]
+}

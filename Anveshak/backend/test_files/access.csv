@@ -1,0 +1,9 @@
+timestamp,user_id,action,resource,status,client_ip
+2024-01-15T02:34:12Z,user123,login,/api/auth,success,192.168.1.101
+2024-01-15T03:45:22Z,unknown,login,/api/auth,failed,10.0.0.100
+2024-01-15T03:46:00Z,unknown,login,/api/auth,failed,10.0.0.100
+2024-01-15T03:47:15Z,admin,read,/etc/passwd,success,10.0.0.100
+2024-01-15T03:48:30Z,admin,execute,sudo_command,success,10.0.0.100
+2024-01-15T04:00:01Z,compromised_user,download,/data/financials.xlsx,success,203.0.113.45
+2024-01-15T04:00:15Z,compromised_user,download,/data/employees.csv,success,203.0.113.45
+2024-01-15T04:00:30Z,compromised_user,download,/data/contracts.pdf,success,203.0.113.45

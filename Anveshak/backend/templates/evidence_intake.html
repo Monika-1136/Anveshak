@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidence Intake</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/lucide-static@latest/font/lucide.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #e6e8eb;
+        }
+        .glow-button {
+            background: linear-gradient(90deg, #00f, #0ff);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            box-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        .glow-button:hover {
+            box-shadow: 0 0 15px #0ff, 0 0 30px #0ff;
+        }
+    </style>
+</head>
+<body class="p-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-[#E6E8EB] mb-2">Upload & Analyze Evidence</h2>
+            <p class="text-sm text-[#8B92A0]">Import forensic artifacts for AI-powered analysis</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="flex gap-4">
+                    <button id="local-import-btn" class="flex-1 p-4 rounded-xl border-2 bg-[rgba(0,255,255,0.1)] border-[#00FFFF] shadow-[0_0_20px_rgba(0,255,255,0.3)]">
+                        <i class="lucide-hard-drive w-6 h-6 mx-auto mb-2 text-[#00FFFF]"></i>
+                        <p class="text-sm font-semibold text-[#00FFFF]">Local Import</p>
+                    </button>
+                    <button id="cloud-import-btn" class="flex-1 p-4 rounded-xl border-2 bg-[rgba(28,31,38,0.6)] border-[rgba(122,92,255,0.2)] hover:border-[rgba(122,92,255,0.4)]">
+                        <i class="lucide-cloud w-6 h-6 mx-auto mb-2 text-[#8B92A0]"></i>
+                        <p class="text-sm font-semibold text-[#8B92A0]">Cloud Import</p>
+                    </button>
+                </div>
+
+                <div id="upload-zone" class="relative border-2 border-dashed rounded-2xl p-12 text-center transition-all border-[rgba(0,255,255,0.3)] bg-[rgba(28,31,38,0.6)] hover:border-[#00FFFF] flex flex-col items-center justify-center">
+                    <i class="lucide-upload w-16 h-16 mx-auto mb-4 text-[#8B92A0]"></i>
+                    <h3 class="text-lg font-semibold text-[#E6E8EB] mb-2">Drop evidence files here or browse</h3>
+                    <p class="text-sm text-[#8B92A0] mb-6">Supported: .log, .pcap, .dd, .E01, .json, .xml, .csv</p>
+                    <button id="browse-btn" class="glow-button">Browse Files</button>
+                </div>
+            </div>
+
+            <div class="bg-[rgba(28,31,38,0.6)] backdrop-blur-xl border border-[rgba(0,255,255,0.2)] rounded-2xl p-6 h-full">
+                <div class="flex items-center gap-3 mb-6">
+                    <i class="lucide-shield w-6 h-6 text-[#00FFB3]"></i>
+                    <h3 class="text-lg font-semibold text-[#E6E8EB]">Evidence Metadata</h3>
+                </div>
+                <div id="metadata-panel" class="space-y-6">
+                    <div id="no-files-message" class="text-center py-16 flex flex-col items-center justify-center h-full">
+                        <i class="lucide-file w-16 h-16 mx-auto mb-4 text-[#8B92A0] opacity-30"></i>
+                        <p class="text-base font-semibold text-[#8B92A0]">No files uploaded</p>
+                        <p class="text-sm text-[#5F6773]">Metadata will appear here once you select a file.</p>
+                    </div>
+                </div>
+                 <div id="analysis-results" class="mt-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" multiple class="hidden" accept=".log,.txt,.pcap,.pcapng,.raw,.mem,.bin,.img,.dd,.E01,.iso,.vmdk,.eml,.pst,.mbox,.json,.csv,.xml,.gz,.zip,.tar">
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const browseBtn = document.getElementById('browse-btn');
+        const uploadZone = document.getElementById('upload-zone');
+        const metadataPanel = document.getElementById('metadata-panel');
+        const noFilesMessage = document.getElementById('no-files-message');
+        const analysisResults = document.getElementById('analysis-results');
+
+        browseBtn.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', handleFileChange);
+
+        function handleFileChange(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            noFilesMessage.style.display = 'none';
+            metadataPanel.innerHTML = ''; // Clear previous metadata
+            analysisResults.innerHTML = ''; // Clear previous analysis results
+
+            Array.from(files).forEach(file => {
+                const fileId = `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                const fileMetadata = document.createElement('div');
+                fileMetadata.className = 'space-y-4 bg-black bg-opacity-20 p-4 rounded-lg';
+                fileMetadata.id = fileId;
+                fileMetadata.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <i class="lucide-file w-5 h-5 text-[#00FFFF] mt-1 flex-shrink-0"></i>
+                        <div class="flex-1">
+                            <p class="text-base font-medium text-[#E6E8EB] break-all">${file.name}</p>
+                            <p class="text-sm text-[#8B92A0]">Size: ${formatFileSize(file.size)}</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 pl-8">
+                        <div>
+                            <p class="text-sm text-[#8B92A0] mb-1">Timestamp</p>
+                            <p class="text-sm text-[#E6E8EB]">${new Date().toLocaleString()}</p>
+                        </div>
+                    </div>
+                    <div class="pl-8 pt-4">
+                        <div class="analysis-status text-sm text-yellow-400">Analyzing...</div>
+                    </div>
+                `;
+                metadataPanel.appendChild(fileMetadata);
+                handleAnalyze(file, fileId);
+            });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) {
+                return `${bytes} bytes`;
+            } else if (bytes < 1024 * 1024) {
+                return `${(bytes / 1024).toFixed(2)} KB`;
+            } else {
+                return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+            }
+        }
+
+        async function handleAnalyze(file, fileId) {
+            const fileElement = document.getElementById(fileId);
+            const statusElement = fileElement.querySelector('.analysis-status');
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const fileContent = event.target.result;
+
+                try {
+                    const response = await fetch("/upload_raw", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            filename: file.name,
+                            content: fileContent
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const results = await response.json();
+                    
+                    const resultContainer = document.createElement('div');
+                    resultContainer.innerHTML = '<h3 class="text-lg font-semibold text-[#E6E8EB] mt-6 mb-4">Analysis for ${file.name}</h3>' +
+                        '<pre class="bg-black bg-opacity-20 p-4 rounded-lg text-sm text-white overflow-auto">' + JSON.stringify(results, null, 2) + '</pre>';
+                    
+                    analysisResults.appendChild(resultContainer);
+                    statusElement.textContent = 'Analysis Complete';
+                    statusElement.classList.remove('text-yellow-400');
+                    statusElement.classList.add('text-green-400');
+
+                } catch (error) {
+                    console.error("Analysis failed:", error);
+                    statusElement.textContent = 'Analysis Failed';
+                    statusElement.classList.remove('text-yellow-400');
+                    statusElement.classList.add('text-red-400');
+                    analysisResults.innerHTML += `<p class="text-red-400">Analysis for ${file.name} failed. Please check the console for details.</p>`;
+                }
+            };
+
+            reader.onerror = (error) => {
+                console.error("File reading failed:", error);
+                statusElement.textContent = 'File Read Failed';
+                statusElement.classList.remove('text-yellow-400');
+                statusElement.classList.add('text-red-400');
+            };
+
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
